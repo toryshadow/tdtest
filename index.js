@@ -1,36 +1,37 @@
 const botsData = [
   {
     name: 'BotA',
-    distance: 100,
+    distance: 50,
     speed: 10,
   },
   {
-    name: 'BotA',
+    name: 'BotA1',
     distance: 100,
-    speed: 10,
+    speed: 20,
   },
   {
     name: 'BotB',
-    distance: 50,
-    speed: 20,
+    distance: 100,
+    speed: 30,
   },
   {
     name: 'BotC',
     distance: 100,
-    speed: 20,
+    speed: 50,
   },
 ];
 
 const main = (towerRange = 50, botsData) => {
   let bots = botsData;
   let turn = 0;
-  let win = true;
+  let loseText = '';
 
-  while(bots.length && win) {
+  while(bots.length && !loseText) {
     turn ++;
     let wasKilled = false;
 
-    let editedBots = bots.map(bot => {
+    // sorted by speed to optimize the tower, kill fast enemies first
+    let editedBots = bots.sort((a, b) => (a.speed > b.speed) ? -1 : (b.speed > a.speed) ? 1 : 0).map(bot => {
       const { distance, speed } = bot;
       const updatedDistance = distance - speed;
 
@@ -41,7 +42,8 @@ const main = (towerRange = 50, botsData) => {
       }
 
       if (wasKilled && updatedDistance <= 0) {
-        win = false;
+        const minimumRange = towerRange + -updatedDistance + 1;
+        loseText = 'To win, you tower should be at least ' + minimumRange + ' range';
       }
       return { ...bot, distance: updatedDistance };
     });
@@ -49,10 +51,10 @@ const main = (towerRange = 50, botsData) => {
     bots = editedBots.filter(bot => !!bot);
   }
 
-  if (win) {
-    alert('Win with ' + turn + ' turn(s)!!!');
+  if (loseText) {
+    alert('Lose on ' + turn + ' turn!!! :( ' + loseText);
   } else {
-    alert('Loose on ' + turn + ' turn!!! :(');
+    alert('Win with ' + turn + ' turn(s)!!!');
   }
 };
 
